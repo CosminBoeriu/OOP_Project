@@ -1,59 +1,75 @@
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <chrono>
-#include <thread>
+#include <cmath>
 
-#ifdef __linux__
-#include <X11/Xlib.h>
-#endif
+using namespace std;
 
-class SomeClass {
+sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+float EPSILON = 0.01;
+
+class Point : sf::Vertex {
 public:
-    explicit SomeClass(int) {}
+    explicit Point(float x, float y, sf::Color color = sf::Color(255, 255, 255)) :
+        sf::Vertex( sf::Vector2f(x, y), color ){}
+    Point(const Point& other) : Vertex(other) {
+        this->position = other.position;
+        this->color = other.color;
+    }
+    Point(const Point& p, float angle, float lenght){
+
+    }
+    bool operator==(const Point& other) {
+        return (other.position == this->position);
+    }
+    friend istream& operator>>(istream& input, Point& myPoint) {
+        float x, y;
+        cin >> x >> y;
+        myPoint.position = sf::Vector2f(x, y);
+        return input;
+    }
+    void set_color( sf::Color color ){
+        this->color = color;
+    }
+
 };
 
-SomeClass *getC() {
-    return new SomeClass{2};
-}
+class Line{
+    Point *endpoints;
+public:
+    explicit Line(Point *v=nullptr): endpoints(v){}
+    void set_color(sf::Color color) {
+        (*endpoints).set_color(color);
+        (*(endpoints+1)).set_color(color);
+    }
 
-int main() {
-    #ifdef __linux__
-    XInitThreads();
-    #endif
+};
 
-    SomeClass *c = getC();
-    std::cout << c << "\n";
-    delete c;
 
-    sf::RenderWindow window;
-    // NOTE: sync with env variable APP_WINDOW from .github/workflows/cmake.yml:30
-    window.create(sf::VideoMode({800, 700}), "My Window", sf::Style::Default);
-    window.setVerticalSyncEnabled(true);
-    //window.setFramerateLimit(60);
+class Sunray : public Line {
+    float lenght;
+public:
+    Sunray(Point *x, float angle, int lenght): Line(), length(lenght) {}
+};
 
-    while(window.isOpen()) {
-        sf::Event e;
-        while(window.pollEvent(e)) {
-            switch(e.type) {
-            case sf::Event::Closed:
-                window.close();
-                break;
-            case sf::Event::Resized:
-                std::cout << "New width: " << window.getSize().x << '\n'
-                          << "New height: " << window.getSize().y << '\n';
-                break;
-            case sf::Event::KeyPressed:
-                std::cout << "Received key " << (e.key.code == sf::Keyboard::X ? "X" : "(other)") << "\n";
-                break;
-            default:
-                break;
-            }
+int main()
+{
+
+    sf::RectangleShape rectangle;
+    rectangle.setSize(sf::Vector2f(100, 50));
+    rectangle.setOutlineColor(sf::Color::Red);
+    rectangle.setOutlineThickness(5);
+    rectangle.setPosition(10, 20);
+
+    window.setFramerateLimit(60);
+    sf::Color color(255, 0, 0);
+    while( window.isOpen() ) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {window.close();}
+
         }
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(300ms);
-
         window.clear();
+        window.draw(rectangle);
         window.display();
     }
 
