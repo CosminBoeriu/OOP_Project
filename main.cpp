@@ -4,10 +4,6 @@
 
 using namespace std;
 
-sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
-const float EPSILON = 0.01;
-const float PI = 3.14159265;
-
 class Point {
 protected:
     sf::Vector2f position;
@@ -15,7 +11,7 @@ protected:
 public:
     explicit Point(float x = 0, float y = 0, sf::Color color = sf::Color(255, 255, 255)) :
         position(sf::Vector2f(x, y)), color(color){}
-    Point(const Point& other){
+    Point([[maybe_unused]] const Point& other){
         this->position = other.position;
         this->color = other.color;
     }
@@ -68,9 +64,15 @@ public:
         *endpoints = a;
         *(endpoints+1) = b;
     }
+    Line& operator=(const Line& other){
+        if(this != &other) {
+            this->endpoints = other.endpoints;
+        }
+        return *this;
+    }
     void drawLine(sf::RenderWindow& wind){
         sf::Vertex line[] = {endpoints[0].get_position(), endpoints[1].get_position()};
-        window.draw(line, 2, sf::Lines);
+        wind.draw(line, 2, sf::Lines);
     }
     void set_color(sf::Color color) {
         (*endpoints).set_color(color);
@@ -79,17 +81,21 @@ public:
 
 };
 
-class Sunray : public Line {
+/*class Sunray : public Line {
     float lenght;
 public:
     Sunray(Point *x, float angle, float lenght): Line(*x, Point(*x, angle, lenght)), lenght(lenght) {}
-};
+};*/
 
 int main()
 {
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
+    // const float EPSILON = 0.01;
+    const float PI = 3.14159265;
+
     SourcePoint sourcep;
     while( window.isOpen() ) {
-        sf::Event event;
+        sf::Event event{};
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {window.close();}
 
@@ -98,6 +104,7 @@ int main()
         for( int i = 0; i <= 360; i++ ){
             Point p(sourcep, float(i) * PI / 180, 1000);
             Line l(sourcep, p);
+            l.set_color(sf::Color(255, 0, 0));
             l.drawLine(window);
         }
 
