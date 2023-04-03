@@ -4,19 +4,22 @@
 
 using namespace std;
 
-sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
 const float EPSILON = 0.01;
 const float PI = 3.14159265;
 
-class Point : sf::Vertex {
+class Point {
+protected:
+    sf::Vector2f position;
+    sf::Color color;
 public:
     explicit Point(float x = 0, float y = 0, sf::Color color = sf::Color(255, 255, 255)) :
-        sf::Vertex( sf::Vector2f(x, y), color ){}
-    Point(const Point& other) : Vertex(other) {
+        position(sf::Vector2f(x, y)), color(color){}
+    Point(const Point& other){
         this->position = other.position;
         this->color = other.color;
     }
-    Point(const Point& p, float angle, float lenght): Vertex(){ //angle is in radians;
+    Point(const Point& p, float angle, float lenght){ //angle is in radians;
         float x = p.position.x + cos(angle) * lenght;
         float y = p.position.y + sin(angle) * lenght;
         this->position = sf::Vector2f(x, y);
@@ -37,13 +40,26 @@ public:
         myPoint.position = sf::Vector2f(x, y);
         return input;
     }
-    void set_color( sf::Color color ){
-        this->color = color;
+    void set_color( sf::Color col ){
+        this->color = col;
+    }
+    sf::Vector2f get_position(){
+        return position;
     }
 
 };
 
-class Line : sf::VertexArray{
+class SourcePoint: public Point{
+public:
+    SourcePoint(): Point(){};
+    void update_position(sf::RenderWindow& wind) {
+        int x = sf::Mouse::getPosition(wind).x;
+        int y = sf::Mouse::getPosition(wind).y;
+        position = sf::Vector2f(float(x), float(y));
+    }
+};
+
+class Line{
     Point *endpoints;
 public:
     explicit Line(Point *v=nullptr): endpoints(v){}
@@ -52,8 +68,9 @@ public:
         *endpoints = a;
         *(endpoints+1) = b;
     }
-    void draw(sf::RenderWindow& wind){
-        window.draw(sf::LineStrip, *endpoints);
+    void drawLine(sf::RenderWindow& wind){
+        sf::Vertex line[] = {endpoints[0].get_position(), endpoints[1].get_position()};
+        window.draw(line, 2, sf::Lines);
     }
     void set_color(sf::Color color) {
         (*endpoints).set_color(color);
@@ -70,24 +87,22 @@ public:
 
 int main()
 {
-
-    sf::RectangleShape rectangle;
-    rectangle.setSize(sf::Vector2f(100, 50));
-    rectangle.setOutlineColor(sf::Color::Red);
-    rectangle.setOutlineThickness(5);
-    rectangle.setPosition(10, 20);
-
-    window.setFramerateLimit(60);
-    sf::Color color(255, 0, 0);
+    SourcePoint sourcep;
     while( window.isOpen() ) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {window.close();}
 
         }
-        window.clear();
-        window.draw(rectangle);
+        sourcep.update_position(window);
+        for( int i = 0; i <= 360; i++ ){
+            Point p(sourcep, float(i) * PI / 180, 1000);
+            Line l(sourcep, p);
+            l.drawLine(window);
+        }
+
         window.display();
+        window.clear();
     }
 
     return 0;
