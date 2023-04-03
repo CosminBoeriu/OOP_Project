@@ -98,7 +98,7 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
     // const float EPSILON = 0.01;
-    const float PI = 3.141592;
+    const float PI = 3.141592f;
 
     SourcePoint sourcep;
     while( window.isOpen() ) {
@@ -109,7 +109,7 @@ int main()
         }
         sourcep.update_position(window);
         for( int i = 0; i <= 360; i++ ){
-            Point p(sourcep, float(i) * PI / 180, 1000);
+            Point p(sourcep, float(float(i) * PI / 180), 1000);
             Line l(sourcep, p);
             l.set_color(sf::Color(255, 255, 0));
             l.drawLine(window);
