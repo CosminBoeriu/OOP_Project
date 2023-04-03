@@ -64,9 +64,16 @@ public:
         *endpoints = a;
         *(endpoints+1) = b;
     }
+    Line(const Line& other){
+        this->endpoints = new Point;
+        this->endpoints[0] = other.endpoints[0];
+        this->endpoints[1] = other.endpoints[1];
+    }
     Line& operator=(const Line& other){
         if(this != &other) {
-            this->endpoints = other.endpoints;
+            this->endpoints = new Point;
+            this->endpoints[0] = other.endpoints[0];
+            this->endpoints[1] = other.endpoints[1];
         }
         return *this;
     }
@@ -91,7 +98,7 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
     // const float EPSILON = 0.01;
-    const float PI = 3.14159265;
+    const float PI = 3.141592;
 
     SourcePoint sourcep;
     while( window.isOpen() ) {
@@ -104,7 +111,7 @@ int main()
         for( int i = 0; i <= 360; i++ ){
             Point p(sourcep, float(i) * PI / 180, 1000);
             Line l(sourcep, p);
-            l.set_color(sf::Color(255, 0, 0));
+            l.set_color(sf::Color(255, 255, 0));
             l.drawLine(window);
         }
 
