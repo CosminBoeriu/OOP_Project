@@ -5,18 +5,28 @@
 using namespace std;
 
 sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
-float EPSILON = 0.01;
+const float EPSILON = 0.01;
+const float PI = 3.14159265;
 
 class Point : sf::Vertex {
 public:
-    explicit Point(float x, float y, sf::Color color = sf::Color(255, 255, 255)) :
+    explicit Point(float x = 0, float y = 0, sf::Color color = sf::Color(255, 255, 255)) :
         sf::Vertex( sf::Vector2f(x, y), color ){}
     Point(const Point& other) : Vertex(other) {
         this->position = other.position;
         this->color = other.color;
     }
-    Point(const Point& p, float angle, float lenght){
-
+    Point(const Point& p, float angle, float lenght): Vertex(){ //angle is in radians;
+        float x = p.position.x + cos(angle) * lenght;
+        float y = p.position.y + sin(angle) * lenght;
+        this->position = sf::Vector2f(x, y);
+    }
+    Point& operator=(const Point&other){
+        if(this != &other) {
+            this->color = other.color;
+            this->position = other.position;
+        }
+        return *this;
     }
     bool operator==(const Point& other) {
         return (other.position == this->position);
@@ -33,10 +43,18 @@ public:
 
 };
 
-class Line{
+class Line : sf::VertexArray{
     Point *endpoints;
 public:
     explicit Line(Point *v=nullptr): endpoints(v){}
+    Line(const Point& a, const Point& b){
+        endpoints = new Point;
+        *endpoints = a;
+        *(endpoints+1) = b;
+    }
+    void draw(sf::RenderWindow& wind){
+        window.draw(sf::LineStrip, *endpoints);
+    }
     void set_color(sf::Color color) {
         (*endpoints).set_color(color);
         (*(endpoints+1)).set_color(color);
@@ -44,11 +62,10 @@ public:
 
 };
 
-
 class Sunray : public Line {
     float lenght;
 public:
-    Sunray(Point *x, float angle, int lenght): Line(), length(lenght) {}
+    Sunray(Point *x, float angle, float lenght): Line(*x, Point(*x, angle, lenght)), lenght(lenght) {}
 };
 
 int main()
