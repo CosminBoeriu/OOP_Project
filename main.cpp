@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <cstdlib>
 #include <cmath>
+const float PI = 3.141592f;
 
 using namespace std;
 
@@ -38,6 +40,9 @@ public:
     }
     void set_color( sf::Color col ){
         this->color = col;
+    }
+    sf::Color get_color(){
+        return this->color;
     }
     sf::Vector2f get_position(){
         return position;
@@ -79,11 +84,55 @@ public:
     }
     void drawLine(sf::RenderWindow& wind){
         sf::Vertex line[] = {endpoints[0].get_position(), endpoints[1].get_position()};
+        line[0].color = endpoints[0].get_color();
+        line[1].color = endpoints[1].get_color();
         wind.draw(line, 2, sf::Lines);
     }
     void set_color(sf::Color color) {
         (*endpoints).set_color(color);
         (*(endpoints+1)).set_color(color);
+    }
+    float get_tangent(){
+        sf::Vector2f p1 = endpoints[0].get_position();
+        sf::Vector2f p2 = endpoints[1].get_position();
+        if( p1.x == p2.x ){
+            return 0;
+        }
+        else{
+            return (p2.y-p1.y)/(p2.x-p1.x);
+        }
+    }
+    float get_reminder(){
+        float m = this->get_tangent();
+        return endpoints[0].get_position().y - endpoints[0].get_position().x * m;
+    }
+    bool test_point_inclusion(Point p){
+        if(((endpoints[0].get_position().x <= p.get_position().x && p.get_position().x <= endpoints[1].get_position().x) ||
+            (endpoints[1].get_position().x <= p.get_position().x && p.get_position().x <= endpoints[0].get_position().x))&&
+            ((endpoints[0].get_position().y <= p.get_position().y && p.get_position().y <= endpoints[1].get_position().y) ||
+            (endpoints[1].get_position().y <= p.get_position().y && p.get_position().y <= endpoints[0].get_position().y))){
+            return true;
+        }
+        return false;
+    }
+    sf::Vector2f get_collision(Line& l){
+        // n1 - n2 = m2 x - m1 x = ( m2 - m1 ) x
+        if( abs(this->get_tangent() - l.get_tangent() ) < 0.001f ){
+            return { -1, -1};
+        }
+        else {
+            float x = (this->get_reminder() - l.get_reminder()) / (l.get_tangent() - this->get_tangent());
+            float y = this->get_tangent() * x + this->get_reminder();
+            Point a(x, y);
+            if (l.test_point_inclusion(a) && this->test_point_inclusion(a)) {
+                return {x, y};
+            } else {
+                return {-1, -1};
+            }
+        }
+    }
+    ~Line(){
+        delete[] endpoints;
     }
 
 };
@@ -98,8 +147,10 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
     // const float EPSILON = 0.01;
-    const float PI = 3.141592f;
-
+    Line *obstacles;
+    int numberOfObstacles = 2;
+    obstacles[0] = Line( Point(301.0f, 301.1f, sf::Color(255, 0, 0)), Point(800.1f, 1000.6f, sf::Color(255, 0, 0)) );
+    obstacles[1] = Line( Point(301.0f, 301.1f, sf::Color(255, 0, 0)), Point(100.1f, 1400.6f, sf::Color(255, 0, 0)) );
     SourcePoint sourcep;
     while( window.isOpen() ) {
         sf::Event event{};
@@ -108,13 +159,26 @@ int main()
 
         }
         sourcep.update_position(window);
-        for( int i = 0; i <= 360; i++ ){
-            Point p(sourcep, float(float(i) * PI / 180), 1000);
-            Line l(sourcep, p);
-            l.set_color(sf::Color(255, 255, 0));
-            l.drawLine(window);
+        for( int i = 1; i < 360; i += 2 ){
+            for( int j = 0; j < numberOfObstacles; j++ ) {
+                Point p(sourcep, float(float(i) * PI / 180), 500);
+                Line *l = new Line(sourcep, p);
+                (*l).set_color(sf::Color(255, 255, 0));
+                sf::Vector2f v = obstacles[j].get_collision(*l);
+                if (v.x != -1) {
+                    delete l;
+                    l = new Line(sourcep, Point(v.x, v.y));
+                    (*l).set_color(sf::Color(255, 255, 0));
+                    (*l).drawLine(window);
+                }
+                else {
+                    (*l).drawLine(window);
+                }
+            }
         }
-
+        for( int i = 0; i < numberOfObstacles; i++ ) {
+            obstacles[i].drawLine(window);
+        }
         window.display();
         window.clear();
     }
