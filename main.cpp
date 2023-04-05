@@ -159,6 +159,7 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
     window.setFramerateLimit(60);
+
     // const float EPSILON = 0.01;
     int numberOfObstacles = 4;
     Line *obstacles = new Line[numberOfObstacles];
@@ -180,7 +181,7 @@ int main()
         }
         sourcep.update_position(window);
         for( int i = 1; i <= 360; i += 2 ){
-            Point p(sourcep, float(float(i) * PI / 180), 10000);
+            Point p(sourcep, float(float(i) * PI / 180), 3000);
             Line *l = new Line(sourcep, p);
             for( int j = 0; j < numberOfObstacles; j++ ) {
                 Point v = obstacles[j].get_collision(*l);
