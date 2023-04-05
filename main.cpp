@@ -154,6 +154,7 @@ public:
     Sunray(Point *x, float angle, float lenght): Line(*x, Point(*x, angle, lenght)), lenght(lenght) {}
 };*/
 
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
