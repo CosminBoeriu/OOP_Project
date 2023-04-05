@@ -38,7 +38,7 @@ public:
         myPoint.position = sf::Vector2f(x, y);
         return input;
     }
-    friend ostream& operator<<(ostream& output, Point& myPoint) {
+    friend ostream& operator<<(ostream& output, const Point& myPoint) {
         cout << myPoint.position.x << ' ' << myPoint.position.y;
         return output;
     }
@@ -85,7 +85,7 @@ public:
         }
         return *this;
     }
-    friend istream& operator>>(istream& input, Line& myLine) {
+    friend istream& operator>>(istream& input, const Line& myLine) {
         cin>>myLine.endpoints[0]>>myLine.endpoints[1];
         return input;
     }
