@@ -85,11 +85,11 @@ public:
         }
         return *this;
     }
-    friend istream& operator>>(istream& input, const Line& myLine) {
+    friend istream& operator>>(istream& input, Line& myLine) {
         cin>>myLine.endpoints[0]>>myLine.endpoints[1];
         return input;
     }
-    friend ostream& operator<<(ostream& output, Line& myLine) {
+    friend ostream& operator<<(ostream& output, const Line& myLine) {
         cout << myLine.endpoints[0] <<' '<< myLine.endpoints[1];
         return output;
     }
