@@ -239,6 +239,7 @@ int main()
 
     return 0;
 }
+
 /*
     un test interesant de intrare:
     2000 1200
