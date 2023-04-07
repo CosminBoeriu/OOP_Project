@@ -66,7 +66,7 @@ public:
 };
 
 class Line{
-public:
+protected:
     Point *endpoints;
 public:
     explicit Line(const Point& a = Point(), const Point& b = Point()){
@@ -192,10 +192,7 @@ public:
 int main()
 {
     int width, height;
-    cout<<"Testele de intrare sunt de forma:"<<endl<<"1. lungime inaltime fereastra"<<endl<<"2. Lungimea in pixeli a razei";
-    cout<<"Numarul de obstacole"<<endl<<"Fiecare obstacol este definit de 4 coordonate, (X1, Y1), (X2, Y2)";
     cin>>width>>height;
-    // const float EPSILON = 0.01;
     int numberOfObstacles;
     float max_len;
     cin>>max_len;
@@ -207,7 +204,6 @@ int main()
     }
     sf::RenderWindow window(sf::VideoMode(width, height), "Light Simulator!");
     window.setFramerateLimit(60);
-    //cout<<obstacles[1];
     sf::Color col = sf::Color(255, 255, 0);
     SourcePoint sourcep;
     while( window.isOpen() ) {
@@ -220,14 +216,11 @@ int main()
             Sunray *l = new Sunray (sourcep, float(float(i) * PI / 180), Sunray::maximum_lenght, col);
             for( int j = 0; j < numberOfObstacles; j++ ) {
                 Point v = obstacles[j].get_collision(*l);
-                //cout<<j<<' '<<v<<endl;
                 if (v.get_position().x != -1) {
                     delete l;
                     l = new Sunray(sourcep, Point(v.get_position().x, v.get_position().y), col);
                 }
             }
-            // if( l->get_lenght() < 999 )
-               // cout<<l->get_lenght()<<' '<<int(l->endpoints[1].get_color().r)<<','<<int(l->endpoints[1].get_color().g)<<','<<int(l->endpoints[1].get_color().b)<<endl;
             (*l).drawLine(window);
         }
         for( int i = 0; i < numberOfObstacles; i++ ) {
@@ -239,15 +232,3 @@ int main()
 
     return 0;
 }
-
-/*
-    un test interesant de intrare:
-    2000 1200
-    2000
-    5
-    1 1 1700 800
-    1800 900 1900 100
-    400 400 600 600
-    500 500 1000 1000
-    123 456 789 1011
-*/

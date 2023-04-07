@@ -1,0 +1,14 @@
+2000 1200
+2000
+5
+1 1 1700 800
+1800 900 1900 100
+400 400 600 600
+500 500 1000 1000
+123 456 789 1011
+
+Testele de intrare sunt de forma:
+1. lungime, inaltime fereastra
+2. Lungimea in pixeli a razei de lumina
+3. Numarul de obstacole ( n obstacole )
+4. N obstacole - Fiecare obstacol este o line definia de 4 coordonate: (X1, Y1), (X2, Y2);
