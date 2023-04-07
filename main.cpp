@@ -17,7 +17,8 @@ public:
         this->position = other.position;
         this->color = other.color;
     }
-    Point(const Point& p, float angle, float lenght){ //angle is in radians;
+    Point(const Point& p, float angle, float lenght, sf::Color color = sf::Color(255, 255, 255)){ //angle is in radians;
+        this->color = color;
         float x = p.position.x + cos(angle) * lenght;
         float y = p.position.y + sin(angle) * lenght;
         this->position = sf::Vector2f(x, y);
@@ -65,6 +66,7 @@ public:
 };
 
 class Line{
+public:
     Point *endpoints;
 public:
     explicit Line(const Point& a = Point(), const Point& b = Point()){
@@ -102,6 +104,16 @@ public:
     void set_color(sf::Color color) {
         (*endpoints).set_color(color);
         (*(endpoints+1)).set_color(color);
+    }
+    void set_color(sf::Color color1, sf::Color color2) {
+        (*endpoints).set_color(color1);
+        (*(endpoints+1)).set_color(color2);
+    }
+    float get_lenght(){
+        float x, y;
+        x = (endpoints[0].get_position().x - endpoints[1].get_position().x);
+        y = (endpoints[0].get_position().y - endpoints[1].get_position().y);
+        return sqrt( x * x + y * y  );
     }
     float get_tangent(){
         sf::Vector2f p1 = endpoints[0].get_position();
@@ -148,31 +160,55 @@ public:
 
 };
 
-/*class Sunray : public Line {
+class Sunray : public Line {
     float lenght;
+    sf::Color color;
 public:
-    Sunray(Point *x, float angle, float lenght): Line(*x, Point(*x, angle, lenght)), lenght(lenght) {}
-};*/
+    inline static float maximum_lenght;
+    explicit Sunray(const Point& x = Point(), float angle = -1, float lenght = 0, sf::Color color = sf::Color(255, 255, 0)):
+        Line(x, Point(x, angle, lenght)), lenght(lenght), color(color) {
+        this->set_color(color, sf::Color(0, 0, 0));
+        this->decoloring();
+    }
+    Sunray(const Point &x, const Point &y, sf::Color color = sf::Color(255, 255, 0)): Line( x, y ){
+        lenght = this->get_lenght();
+        this->set_color(color, sf::Color(0, 0, 0));
+        this->color = color;
+        this->decoloring();
+    }
+    static void set_max_lenght(float lenght){
+        maximum_lenght = lenght;
+    }
+    void decoloring(){
+        sf::Color col;
+        col.r = max(color.r - (unsigned char)(( lenght / Sunray::maximum_lenght ) * 255), 0);
+        col.g = max(color.g - (unsigned char)(( lenght / Sunray::maximum_lenght ) * 255), 0);
+        col.b = max(color.b - (unsigned char)(( lenght / Sunray::maximum_lenght ) * 255), 0);
+        endpoints[1].set_color(col);
+    }
+};
 
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Light Simulator!");
-    window.setFramerateLimit(60);
-
+    int width, height;
+    cout<<"Testele de intrare sunt de forma:"<<endl<<"1. lungime inaltime fereastra"<<endl<<"2. Lungimea in pixeli a razei";
+    cout<<"Numarul de obstacole"<<endl<<"Fiecare obstacol este definit de 4 coordonate, (X1, Y1), (X2, Y2)";
+    cin>>width>>height;
     // const float EPSILON = 0.01;
-    int numberOfObstacles = 4;
+    int numberOfObstacles;
+    float max_len;
+    cin>>max_len;
+    Sunray::set_max_lenght(max_len);
+    cin>>numberOfObstacles;
     Line *obstacles = new Line[numberOfObstacles];
     for( int i = 0; i < numberOfObstacles; i++ ){
         cin>>obstacles[i];
     }
-    /*
-    1 1 800 800
-    1 800 800 1
-    1890 300 439 567
-    600 900 300 1200
-    */
+    sf::RenderWindow window(sf::VideoMode(width, height), "Light Simulator!");
+    window.setFramerateLimit(60);
     //cout<<obstacles[1];
+    sf::Color col = sf::Color(255, 255, 0);
     SourcePoint sourcep;
     while( window.isOpen() ) {
         sf::Event event{};
@@ -181,17 +217,17 @@ int main()
         }
         sourcep.update_position(window);
         for( int i = 1; i <= 360; i += 2 ){
-            Point p(sourcep, float(float(i) * PI / 180), 3000);
-            Line *l = new Line(sourcep, p);
+            Sunray *l = new Sunray (sourcep, float(float(i) * PI / 180), Sunray::maximum_lenght, col);
             for( int j = 0; j < numberOfObstacles; j++ ) {
                 Point v = obstacles[j].get_collision(*l);
                 //cout<<j<<' '<<v<<endl;
                 if (v.get_position().x != -1) {
                     delete l;
-                    l = new Line(sourcep, Point(v.get_position().x, v.get_position().y));
+                    l = new Sunray(sourcep, Point(v.get_position().x, v.get_position().y), col);
                 }
             }
-            (*l).set_color(sf::Color(255, 255, 0));
+            // if( l->get_lenght() < 999 )
+               // cout<<l->get_lenght()<<' '<<int(l->endpoints[1].get_color().r)<<','<<int(l->endpoints[1].get_color().g)<<','<<int(l->endpoints[1].get_color().b)<<endl;
             (*l).drawLine(window);
         }
         for( int i = 0; i < numberOfObstacles; i++ ) {
@@ -203,3 +239,14 @@ int main()
 
     return 0;
 }
+/*
+    un test interesant de intrare:
+    2000 1200
+    2000
+    5
+    1 1 1700 800
+    1800 900 1900 100
+    400 400 600 600
+    500 500 1000 1000
+    123 456 789 1011
+*/
