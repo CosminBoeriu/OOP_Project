@@ -34,7 +34,7 @@ public:
         calculate_center();
     }
 
-    virtual std::unique_ptr<Shape> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<Shape> clone() const = 0;
 
     Shape& operator=(const Shape& other){
         if( this != &other){
@@ -108,7 +108,7 @@ public:
     explicit RotatingSh( const std::vector<sf::Vector2f>&v={}, int num=0, float add_angle = 1.0f ) : Shape(v, num),
         angle_change(add_angle) {}
 
-    std::unique_ptr<Shape> clone() const override{
+    [[nodiscard]] std::unique_ptr<Shape> clone() const override{
         return std::make_unique<RotatingSh>(*this);
     };
 
@@ -131,7 +131,7 @@ public:
             newPos.x = oldPos.x * std::cos(add_angle) - oldPos.y * std::sin(add_angle) + center.get_position().x -
                     center.get_position().x * std::cos(add_angle) + center.get_position().y * std::sin(add_angle);
             newPos.y = oldPos.x * std::sin(add_angle) + oldPos.y * std::cos(add_angle) + center.get_position().y -
-                    center.get_position().x * std::sin(add_angle) - center.get_position().y * std::cos(add_angle);;
+                    center.get_position().x * std::sin(add_angle) - center.get_position().y * std::cos(add_angle);
             points[i].set_position(newPos);
         }
         for ( unsigned long long i = 0; i < num_points; i++ ){
@@ -183,7 +183,7 @@ public:
         }
     }
 
-    std::unique_ptr<Shape> clone() const override{
+    [[nodiscard]] std::unique_ptr<Shape> clone() const override{
         return std::make_unique<MovingSh>(*this);
     };
 
@@ -209,7 +209,7 @@ public:
         Point p(trajectory[0] * float(std::pow((1-t), num_of_tr_points-1)) +
                 trajectory[num_of_tr_points-1] * float(std::pow(t, num_of_tr_points-1)));
         auto exponent = float(num_of_tr_points-1);
-        for( int i = 1; i < num_of_tr_points-1; i++ ){
+        for( unsigned long long i = 1; i < num_of_tr_points-1; i++ ){
             p = p + trajectory[i] * exponent * float(std::pow(1-t, i) * std::pow(t, num_of_tr_points-1-i));
             exponent = exponent * float( num_of_tr_points - 1 - i ) / float( i + 1 );
         }

@@ -38,7 +38,7 @@ public:
     bool operator==(const Point& other) {
         return (other.position == this->position);
     }
-    float get_distance(const Point& other) const{
+    [[nodiscard]] float get_distance(const Point& other) const{
         return float(std::sqrt(std::pow(other.position.x - this->position.x, 2) + std::pow(other.position.y - this->position.y, 2)));
     }
     friend std::istream& operator>>(std::istream& input, Point& myPoint) {

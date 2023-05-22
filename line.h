@@ -152,7 +152,7 @@ public:
         col.b = std::max(color.b - (unsigned char)(( length / Sunray::maximum_lenght ) * 255), 0);
         endpoints[1].set_color(col);
     }
-    float get_length() const{
+    [[nodiscard]] float get_length() const{
         return length;
     }
 };

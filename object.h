@@ -23,7 +23,7 @@ public:
     void toggle_movement() override{
         MovingSh::toggle_movement();
     }
-    virtual std::unique_ptr<Shape> clone() const override{
+    [[nodiscard]] std::unique_ptr<Shape> clone() const override{
         return std::make_unique<Object>(*this);
     };
 
