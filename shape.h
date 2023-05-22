@@ -113,9 +113,7 @@ public:
     };
 
     void read() override{
-        std::vector<sf::Vector2f>v1, v2;
-        int frames;
-        float time;
+        std::vector<sf::Vector2f>v1;
         std::cin>>num_points>>this->angle_change;
         for(unsigned long long i = 0; i < num_points; i++ ){
             v1.emplace_back();
