@@ -1,14 +1,29 @@
-2000 1200
-2000
-5
-1 1 1700 800
-1800 900 1900 100
-400 400 600 600
-500 500 1000 1000
-123 456 789 1011
+Formele sunt creeate apasant C pe tastatura:
+Se copiaza tot textul ca sa mearga
 
-Testele de intrare sunt de forma:
-1. lungime, inaltime fereastra
-2. Lungimea in pixeli a razei de lumina
-3. Numarul de obstacole ( n obstacole )
-4. N obstacole - Fiecare obstacol este o line definia de 4 coordonate: (X1, Y1), (X2, Y2);
+
+Object
+5 2 3 10 1 60
+100 100
+200 200
+170 300
+80 300
+0 240
+2000 0
+1000 1000
+
+
+Rotating
+3 1
+850 850
+1400 850
+1400 1400
+
+
+Moving
+3 2 10 0 60
+50 1300
+100 1400
+300 1050
+2000 2000
+1200 300

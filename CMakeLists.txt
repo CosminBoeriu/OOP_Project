@@ -93,7 +93,7 @@ endif()
 ###############################################################################
 
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp point.h line.h shape.h game.h object.h Mouse.h)
 
 ###############################################################################
 
